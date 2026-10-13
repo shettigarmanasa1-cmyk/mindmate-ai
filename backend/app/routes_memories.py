@@ -1,8 +1,9 @@
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, StringConstraints
 
+from app import memory_retrieval
 from app import memory_service as service
 
 Content = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=300)]
@@ -33,6 +34,10 @@ router = APIRouter(prefix="/api/memories", tags=["memories"])
 def list_memories():
     return service.list_memories()
 
+@router.get("/relevant")
+def relevant_memories(q: Annotated[str, Query(min_length=1, max_length=500)]):
+    """Show which saved memories would be used for this question."""
+    return memory_retrieval.find_relevant_memories(q)
 
 @router.post("", status_code=201)
 def create_memory(body: MemoryCreate):
