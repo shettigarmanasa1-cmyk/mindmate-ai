@@ -10,6 +10,7 @@ from app.memory_service import MemoryServiceError
 from app.routes_chat import router as chat_router
 from app.routes_conversations import router as conversations_router
 from app.routes_memories import router as memories_router
+from app.routes_settings import router as settings_router
 
 
 @asynccontextmanager
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(conversations_router)
 app.include_router(chat_router)
 app.include_router(memories_router)
+app.include_router(settings_router)
 
 
 @app.exception_handler(MemoryServiceError)
