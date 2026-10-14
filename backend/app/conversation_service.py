@@ -105,3 +105,7 @@ def search_conversations(query: str) -> list[dict]:
             (pattern, pattern),
         ).fetchall()
     return [dict(row) for row in rows]
+def delete_all_conversations() -> int:
+    """Delete every conversation (messages go with them). Returns the count."""
+    with get_db() as conn:
+        return conn.execute("DELETE FROM conversations").rowcount

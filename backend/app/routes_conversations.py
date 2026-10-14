@@ -32,6 +32,12 @@ def create_conversation(body: ConversationCreate = ConversationCreate()):
 @router.get("")
 def list_conversations():
     return service.list_conversations()
+@router.delete("")
+def delete_all_conversations(confirm: bool = False):
+    # The server itself refuses to delete everything without confirmation.
+    if not confirm:
+        raise HTTPException(status_code=400, detail="Confirmation required: add ?confirm=true")
+    return {"deleted": service.delete_all_conversations()}
 
 
 # "search" must come BEFORE "/{conversation_id}", or FastAPI would treat

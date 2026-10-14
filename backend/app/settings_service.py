@@ -1,24 +1,44 @@
 from app.database import get_db
 
-DEFAULTS = {"memory_enabled": "true"}
+STYLES = ("friendly", "professional", "casual")
+LENGTHS = ("short", "balanced", "detailed")
+
+DEFAULTS = {
+    "memory_enabled": "true",
+    "response_style": "friendly",
+    "answer_length": "balanced",
+    "beginner_friendly": "false",
+}
 
 
 def get_settings() -> dict:
     with get_db() as conn:
         rows = conn.execute("SELECT key, value FROM settings").fetchall()
-    stored = {row["key"]: row["value"] for row in rows}
-    merged = {**DEFAULTS, **stored}
-    return {"memory_enabled": merged["memory_enabled"] == "true"}
+    merged = {**DEFAULTS, **{row["key"]: row["value"] for row in rows}}
+    style = merged["response_style"]
+    length = merged["answer_length"]
+    return {
+        "memory_enabled": merged["memory_enabled"] == "true",
+        "response_style": style if style in STYLES else DEFAULTS["response_style"],
+        "answer_length": length if length in LENGTHS else DEFAULTS["answer_length"],
+        "beginner_friendly": merged["beginner_friendly"] == "true",
+    }
 
 
-def update_settings(memory_enabled: bool | None = None) -> dict:
-    if memory_enabled is not None:
+def update_settings(changes: dict) -> dict:
+    values = {}
+    for key, value in changes.items():
+        if key not in DEFAULTS or value is None:
+            continue
+        values[key] = ("true" if value else "false") if isinstance(value, bool) else str(value)
+    if values:
         with get_db() as conn:
-            conn.execute(
-                "INSERT INTO settings (key, value) VALUES ('memory_enabled', ?) "
-                "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-                ("true" if memory_enabled else "false",),
-            )
+            for key, value in values.items():
+                conn.execute(
+                    "INSERT INTO settings (key, value) VALUES (?, ?) "
+                    "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    (key, value),
+                )
     return get_settings()
 
 

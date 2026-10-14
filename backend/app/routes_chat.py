@@ -6,6 +6,7 @@ from pydantic import BaseModel, StringConstraints
 from app import conversation_service as service
 from app import llm_service, memory_detection, memory_retrieval, settings_service
 from app.memory_context import build_memory_message
+from app.style_context import build_style_message
 
 MAX_HISTORY_MESSAGES = 20  # only the latest messages are sent to the AI
 
@@ -44,6 +45,10 @@ def chat(body: ChatRequest):
     memory_message = build_memory_message(relevant)
     if memory_message:
         history = [memory_message] + history
+
+    style_message = build_style_message(settings_service.get_settings())
+    if style_message:
+        history = [style_message] + history
 
     try:
         reply = llm_service.generate_reply(history)
