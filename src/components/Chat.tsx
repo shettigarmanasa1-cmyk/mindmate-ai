@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
+import SuggestionCard from './SuggestionCard'
 import { getConversation, sendChat } from '../lib/api'
-import type { ChatMessage } from '../lib/api'
+import type { ChatMessage, Proposal, ProvidedMemory } from '../lib/api'
 
 interface Props {
   conversationId: string | null
   onConversationChange: (id: string | null) => void
   onActivity: () => void
+  onMemoryChange: () => void
 }
 
-export default function Chat({ conversationId, onConversationChange, onActivity }: Props) {
+export default function Chat({ conversationId, onConversationChange, onActivity, onMemoryChange }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [provided, setProvided] = useState<Record<string, ProvidedMemory[] | undefined>>({})
+  const [suggestions, setSuggestions] = useState<Proposal[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,6 +25,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
     if (conversationId === null) {
       ownId.current = null
       setMessages([])
+      setSuggestions([])
       setError(null)
       return
     }
@@ -30,6 +35,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
     let cancelled = false
     setError(null)
     setMessages([])
+    setSuggestions([])
     getConversation(conversationId)
       .then((conversation) => {
         if (!cancelled) setMessages(conversation.messages)
@@ -44,7 +50,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, loading])
+  }, [messages, suggestions, loading])
 
   async function handleSend(event: React.FormEvent) {
     event.preventDefault()
@@ -53,6 +59,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
 
     setError(null)
     setInput('')
+    setSuggestions([])
     setLoading(true)
 
     const temp: ChatMessage = {
@@ -72,6 +79,12 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
         result.user_message,
         result.assistant_message,
       ])
+      setProvided((current) => ({
+        ...current,
+        [result.assistant_message.id]: result.memories_provided,
+      }))
+      setSuggestions(result.proposed_memories)
+      if (result.proposed_memories.length > 0) onMemoryChange()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
@@ -90,11 +103,44 @@ export default function Chat({ conversationId, onConversationChange, onActivity 
         {messages.length === 0 && !loading && !error && (
           <p className="empty">Say hello to start a conversation.</p>
         )}
-        {messages.map((m) => (
-          <div key={m.id} className={`message ${m.role}`}>
-            <span className="who">{m.role === 'user' ? 'You' : 'MindMate'}</span>
-            <p>{m.content}</p>
-          </div>
+        {messages.map((m) => {
+          const used = provided[m.id] ?? []
+          return (
+            <div key={m.id} className={`message ${m.role}`}>
+              <span className="who">{m.role === 'user' ? 'You' : 'MindMate'}</span>
+              <p>{m.content}</p>
+              {used.length > 0 && (
+                <details className="provided">
+                  <summary>
+                    {used.length === 1
+                      ? '1 memory provided to the AI'
+                      : used.length + ' memories provided to the AI'}
+                  </summary>
+                  <ul>
+                    {used.map((memory) => (
+                      <li key={memory.id}>
+                        {memory.content}{' '}
+                        <span className="terms">(matched: {memory.matched_terms.join(', ')})</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="provided-note">
+                    Provided means sent with your question. The AI may not have used it.
+                  </p>
+                </details>
+              )}
+            </div>
+          )
+        })}
+        {suggestions.map((proposal) => (
+          <SuggestionCard
+            key={proposal.id}
+            proposal={proposal}
+            onDecided={() => {
+              setSuggestions((current) => current.filter((s) => s.id !== proposal.id))
+              onMemoryChange()
+            }}
+          />
         ))}
         {loading && <p className="loading">MindMate is thinking...</p>}
         {error && (

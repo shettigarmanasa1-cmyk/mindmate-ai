@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import Chat from './components/Chat'
+import MemoryPanel from './components/MemoryPanel'
 import Sidebar from './components/Sidebar'
 import {
   deleteConversation,
@@ -15,6 +16,10 @@ export default function App() {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [view, setView] = useState<'chat' | 'memories'>('chat')
+  const [memoryVersion, setMemoryVersion] = useState(0)
+
+  const bumpMemory = useCallback(() => setMemoryVersion((v) => v + 1), [])
 
   const refresh = useCallback(async () => {
     try {
@@ -51,12 +56,48 @@ export default function App() {
         search={search}
         loadError={loadError}
         onSearchChange={setSearch}
-        onSelect={setActiveId}
-        onNew={() => setActiveId(null)}
+        onSelect={(id) => {
+          setActiveId(id)
+          setView('chat')
+        }}
+        onNew={() => {
+          setActiveId(null)
+          setView('chat')
+        }}
         onRename={handleRename}
         onDelete={handleDelete}
       />
-      <Chat conversationId={activeId} onConversationChange={setActiveId} onActivity={refresh} />
+      <div className="main-col">
+        <div className="tabs" role="navigation" aria-label="Sections">
+          <button
+            type="button"
+            className={view === 'chat' ? 'tab active' : 'tab'}
+            aria-current={view === 'chat' ? 'page' : undefined}
+            onClick={() => setView('chat')}
+          >
+            Chat
+          </button>
+          <button
+            type="button"
+            className={view === 'memories' ? 'tab active' : 'tab'}
+            aria-current={view === 'memories' ? 'page' : undefined}
+            onClick={() => setView('memories')}
+          >
+            Memories
+          </button>
+        </div>
+        <div className="pane" hidden={view !== 'chat'}>
+          <Chat
+            conversationId={activeId}
+            onConversationChange={setActiveId}
+            onActivity={refresh}
+            onMemoryChange={bumpMemory}
+          />
+        </div>
+        <div className="pane" hidden={view !== 'memories'}>
+          <MemoryPanel version={memoryVersion} onChange={bumpMemory} />
+        </div>
+      </div>
     </main>
   )
 }

@@ -111,3 +111,59 @@ export function deleteConversation(id: string) {
     method: 'DELETE',
   })
 }
+
+export interface Memory {
+  id: string
+  content: string
+  category: string
+  keywords: string
+  created_at: string
+  updated_at: string
+}
+
+export function listMemories() {
+  return request<Memory[]>('/api/memories')
+}
+
+export function createMemory(content: string, category: string) {
+  return request<Memory>('/api/memories', {
+    method: 'POST',
+    body: JSON.stringify({ content, category }),
+  })
+}
+
+export function updateMemory(id: string, content: string, category: string) {
+  return request<Memory>('/api/memories/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    body: JSON.stringify({ content, category }),
+  })
+}
+
+export function deleteMemory(id: string) {
+  return request<void>('/api/memories/' + encodeURIComponent(id), {
+    method: 'DELETE',
+  })
+}
+
+export function clearMemories() {
+  return request<{ deleted: number }>('/api/memories?confirm=true', {
+    method: 'DELETE',
+  })
+}
+
+export function listProposals() {
+  return request<Proposal[]>('/api/memories/proposals')
+}
+
+export function approveProposal(id: string) {
+  return request<{ replaced: boolean }>(
+    '/api/memories/proposals/' + encodeURIComponent(id) + '/approve',
+    { method: 'POST' },
+  )
+}
+
+export function rejectProposal(id: string) {
+  return request<Proposal>('/api/memories/proposals/' + encodeURIComponent(id) + '/reject', {
+    method: 'POST',
+  })
+}
