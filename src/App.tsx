@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import Chat from './components/Chat'
 import MemoryPanel from './components/MemoryPanel'
+import PrivacyPanel from './components/PrivacyPanel'
+import SettingsPanel from './components/SettingsPanel'
 import Sidebar from './components/Sidebar'
 import {
   deleteConversation,
@@ -11,12 +13,21 @@ import {
 import type { Conversation } from './lib/api'
 import './App.css'
 
+type View = 'chat' | 'memories' | 'settings' | 'privacy'
+
+const TABS: { id: View; label: string }[] = [
+  { id: 'chat', label: 'Chat' },
+  { id: 'memories', label: 'Memories' },
+  { id: 'settings', label: 'Settings' },
+  { id: 'privacy', label: 'Privacy' },
+]
+
 export default function App() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [view, setView] = useState<'chat' | 'memories'>('chat')
+  const [view, setView] = useState<View>('chat')
   const [memoryVersion, setMemoryVersion] = useState(0)
 
   const bumpMemory = useCallback(() => setMemoryVersion((v) => v + 1), [])
@@ -48,6 +59,11 @@ export default function App() {
     await refresh()
   }
 
+  function handleAllConversationsDeleted() {
+    setActiveId(null)
+    refresh()
+  }
+
   return (
     <main className="app">
       <Sidebar
@@ -69,22 +85,17 @@ export default function App() {
       />
       <div className="main-col">
         <div className="tabs" role="navigation" aria-label="Sections">
-          <button
-            type="button"
-            className={view === 'chat' ? 'tab active' : 'tab'}
-            aria-current={view === 'chat' ? 'page' : undefined}
-            onClick={() => setView('chat')}
-          >
-            Chat
-          </button>
-          <button
-            type="button"
-            className={view === 'memories' ? 'tab active' : 'tab'}
-            aria-current={view === 'memories' ? 'page' : undefined}
-            onClick={() => setView('memories')}
-          >
-            Memories
-          </button>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={view === tab.id ? 'tab active' : 'tab'}
+              aria-current={view === tab.id ? 'page' : undefined}
+              onClick={() => setView(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
         <div className="pane" hidden={view !== 'chat'}>
           <Chat
@@ -96,6 +107,15 @@ export default function App() {
         </div>
         <div className="pane" hidden={view !== 'memories'}>
           <MemoryPanel version={memoryVersion} onChange={bumpMemory} />
+        </div>
+        <div className="pane" hidden={view !== 'settings'}>
+          <SettingsPanel />
+        </div>
+        <div className="pane" hidden={view !== 'privacy'}>
+          <PrivacyPanel
+            onConversationsDeleted={handleAllConversationsDeleted}
+            onMemoryChange={bumpMemory}
+          />
         </div>
       </div>
     </main>

@@ -167,3 +167,42 @@ export function rejectProposal(id: string) {
     method: 'POST',
   })
 }
+export interface AppSettings {
+  memory_enabled: boolean
+  response_style: 'friendly' | 'professional' | 'casual'
+  answer_length: 'short' | 'balanced' | 'detailed'
+  beginner_friendly: boolean
+}
+
+export function getSettings() {
+  return request<AppSettings>('/api/settings')
+}
+
+export function updateSettings(changes: Partial<AppSettings>) {
+  return request<AppSettings>('/api/settings', {
+    method: 'PATCH',
+    body: JSON.stringify(changes),
+  })
+}
+
+export interface DataInfo {
+  storage_location: string
+  stored: { what: string; table: string }[]
+  sent_to_ai_provider: string[]
+  not_stored_in_database: string[]
+  your_controls: string[]
+}
+
+export function getDataInfo() {
+  return request<DataInfo>('/api/data-info')
+}
+
+export function exportData() {
+  return request<unknown>('/api/export')
+}
+
+export function deleteAllConversations() {
+  return request<{ deleted: number }>('/api/conversations?confirm=true', {
+    method: 'DELETE',
+  })
+}
