@@ -1,17 +1,121 @@
 .app {
   height: 100vh;
   display: flex;
-  justify-content: center;
+}
+
+.sidebar {
+  width: 270px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.sidebar input[type='search'] {
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.new-btn {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.conv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conv {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.conv.active {
+  background: var(--assistant-bg);
+}
+
+.conv-title {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-btn {
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  color: var(--muted);
+  border-color: transparent;
+  background: transparent;
+}
+
+.mini-btn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.mini-btn.danger:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.conv-edit,
+.conv-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px;
+  font-size: 0.9rem;
+}
+
+.conv-edit input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.conv-empty {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 8px;
 }
 
 .chat {
-  width: 100%;
-  max-width: 800px;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
 }
 
 .chat-header {
@@ -104,11 +208,17 @@
   border-color: var(--accent);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+  .app {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
   .message {
     max-width: 92%;
-  }
-  .chat {
-    border: none;
   }
 }

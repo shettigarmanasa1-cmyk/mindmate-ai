@@ -1,16 +1,47 @@
 import { useEffect, useRef, useState } from 'react'
-import { sendChat } from '../lib/api'
+import { getConversation, sendChat } from '../lib/api'
 import type { ChatMessage } from '../lib/api'
 
-export default function Chat() {
+interface Props {
+  conversationId: string | null
+  onConversationChange: (id: string | null) => void
+  onActivity: () => void
+}
+
+export default function Chat({ conversationId, onConversationChange, onActivity }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [conversationId, setConversationId] = useState<string | null>(null)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  // Remembers a conversation this component just created, so it is not reloaded.
+  const ownId = useRef<string | null>(null)
 
-  // Keep the newest message in view.
+  useEffect(() => {
+    if (conversationId === null) {
+      ownId.current = null
+      setMessages([])
+      setError(null)
+      return
+    }
+    if (conversationId === ownId.current) return
+    ownId.current = null
+
+    let cancelled = false
+    setError(null)
+    setMessages([])
+    getConversation(conversationId)
+      .then((conversation) => {
+        if (!cancelled) setMessages(conversation.messages)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Could not load this conversation.')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [conversationId])
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
@@ -24,7 +55,6 @@ export default function Chat() {
     setInput('')
     setLoading(true)
 
-    // Show the user's message right away.
     const temp: ChatMessage = {
       id: 'temp-' + Date.now(),
       role: 'user',
@@ -35,7 +65,8 @@ export default function Chat() {
 
     try {
       const result = await sendChat(text, conversationId)
-      setConversationId(result.conversation_id)
+      ownId.current = result.conversation_id
+      onConversationChange(result.conversation_id)
       setMessages((current) => [
         ...current.filter((m) => m.id !== temp.id),
         result.user_message,
@@ -45,26 +76,18 @@ export default function Chat() {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
       setLoading(false)
+      onActivity()
     }
-  }
-
-  function handleNew() {
-    setMessages([])
-    setConversationId(null)
-    setError(null)
   }
 
   return (
     <section className="chat" aria-label="Chat">
       <header className="chat-header">
         <h1>MindMate AI</h1>
-        <button type="button" onClick={handleNew}>
-          New conversation
-        </button>
       </header>
 
       <div className="messages" aria-live="polite">
-        {messages.length === 0 && !loading && (
+        {messages.length === 0 && !loading && !error && (
           <p className="empty">Say hello to start a conversation.</p>
         )}
         {messages.map((m) => (
@@ -73,7 +96,7 @@ export default function Chat() {
             <p>{m.content}</p>
           </div>
         ))}
-        {loading && <p className="loading">MindMate is thinking…</p>}
+        {loading && <p className="loading">MindMate is thinking...</p>}
         {error && (
           <p className="error" role="alert">
             {error}
@@ -91,7 +114,7 @@ export default function Chat() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message…"
+          placeholder="Type a message..."
           maxLength={4000}
           disabled={loading}
           autoComplete="off"

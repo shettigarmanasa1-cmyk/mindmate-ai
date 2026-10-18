@@ -74,3 +74,40 @@ export function sendChat(message: string, conversationId: string | null) {
     body: JSON.stringify({ message, conversation_id: conversationId }),
   })
 }
+
+
+export interface Conversation {
+  id: string
+  title: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ConversationDetail extends Conversation {
+  messages: ChatMessage[]
+}
+
+export function listConversations() {
+  return request<Conversation[]>('/api/conversations')
+}
+
+export function searchConversations(query: string) {
+  return request<Conversation[]>('/api/conversations/search?q=' + encodeURIComponent(query))
+}
+
+export function getConversation(id: string) {
+  return request<ConversationDetail>('/api/conversations/' + encodeURIComponent(id))
+}
+
+export function renameConversation(id: string, title: string) {
+  return request<Conversation>('/api/conversations/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    body: JSON.stringify({ title }),
+  })
+}
+
+export function deleteConversation(id: string) {
+  return request<void>('/api/conversations/' + encodeURIComponent(id), {
+    method: 'DELETE',
+  })
+}
