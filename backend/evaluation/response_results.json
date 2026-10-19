@@ -1,0 +1,418 @@
+{
+  "measured_at": "2026-10-19T11:33:50",
+  "model": "openai/gpt-oss-20b",
+  "provider_url": "https://api.groq.com/openai/v1",
+  "repeats": 3,
+  "summary": {
+    "on": {
+      "task_success": "15/18",
+      "task_success_rate": 0.833,
+      "errors": 0,
+      "latency_median_s": 2.43,
+      "latency_max_s": 10.72
+    },
+    "off": {
+      "task_success": "9/18",
+      "task_success_rate": 0.5,
+      "errors": 0,
+      "latency_median_s": 3.19,
+      "latency_max_s": 14.61
+    }
+  },
+  "scenarios": [
+    {
+      "id": "s1",
+      "what": "Relevant memory shapes the answer",
+      "memories": [
+        "User's chatbot project uses SQLite"
+      ],
+      "question": "How should I design the tables for my chatbot project?",
+      "must_contain_any": [
+        "sqlite"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "id": "s2",
+      "what": "Stated preference is respected",
+      "memories": [
+        "User prefers Java for backend work"
+      ],
+      "question": "Which framework should I use for my backend work?",
+      "must_contain_any": [
+        "java",
+        "spring"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "id": "s3",
+      "what": "Goal memory is used for advice",
+      "memories": [
+        "User is preparing for a data engineer interview"
+      ],
+      "question": "Give me some interview tips",
+      "must_contain_any": [
+        "data engineer",
+        "data engineering"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "id": "s4",
+      "what": "Unrelated memory is ignored",
+      "memories": [
+        "User likes spicy food"
+      ],
+      "question": "Explain how Python decorators work",
+      "must_contain_any": [
+        "decorator"
+      ],
+      "must_not_contain": [
+        "spicy"
+      ]
+    },
+    {
+      "id": "s5",
+      "what": "No memory: the AI should not invent facts",
+      "memories": [],
+      "question": "Which programming language do I prefer?",
+      "must_contain_any": [
+        "don't know",
+        "do not know",
+        "don't have",
+        "not sure",
+        "haven't",
+        "tell me",
+        "let me know",
+        "no way to know",
+        "can't know",
+        "cannot know",
+        "i don't",
+        "i do not"
+      ],
+      "must_not_contain": []
+    },
+    {
+      "id": "s6",
+      "what": "Uses the relevant memory, ignores the unrelated one",
+      "memories": [
+        "User is learning guitar",
+        "User's chatbot project uses SQLite"
+      ],
+      "question": "Help me plan the database for my chatbot project",
+      "must_contain_any": [
+        "sqlite"
+      ],
+      "must_not_contain": [
+        "guitar"
+      ]
+    }
+  ],
+  "results": {
+    "on": {
+      "s1": [
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": true,
+          "seconds": 2.6040703999997277,
+          "error": null,
+          "reply": "It depends on what your chatbot needs to do, but I can give you a \u201cstarter kit\u201d of tables that covers most typical features (conversations, users, intents, knowledge\u2011base, logs, etc.) and then we can fine\u2011tune it with you.\n\n---\n\n## 1. Core concepts\n\n| Concept | Typical data you\u2019ll store | Why it matters |\n|---------|---------------------------|----------------|\n| **User** | ID, name, contact info,"
+        },
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": true,
+          "seconds": 2.3211758999996164,
+          "error": null,
+          "reply": "Sure! Designing a database for a chatbot is all about capturing the flow of conversations and the data you\u2019ll need to power the bot\u2019s logic.  \nBecause you\u2019re using SQLite, we\u2019ll keep the schema simple yet flexible enough to grow.\n\n---\n\n## 1. High\u2011Level Goals\n\n| Goal | What it means for the schema |\n|------|------------------------------|\n| **Track who is talking** | Store user and bot identities. "
+        },
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": false,
+          "seconds": 2.4318871000004947,
+          "error": null,
+          "reply": "Sure! Designing a solid database schema is key to keeping your chatbot organized and scalable. Let\u2019s start by getting a quick picture of what you need to store:\n\n| Category | Typical data you might want to keep | Example table name |\n|----------|-------------------------------------|--------------------|\n| **Users / Profiles** | User ID, name, email, created\u2011at | `users` |\n| **Conversations** | Co"
+        }
+      ],
+      "s2": [
+        {
+          "provided": [
+            "User prefers Java for backend work"
+          ],
+          "ok": true,
+          "seconds": 2.0101856000001135,
+          "error": null,
+          "reply": "It depends on a few things\u2014what you\u2019re building, how fast you want to ship, and what your team already knows.  \nBelow are the most common Java\u2011backend frameworks, a quick snapshot of their strengths, and a few questions that can help narrow it down.\n\n| Framework | Typical Use Case | Key Strengths | When it\u2019s a good fit |\n|-----------|------------------|---------------|----------------------|\n| **S"
+        },
+        {
+          "provided": [
+            "User prefers Java for backend work"
+          ],
+          "ok": true,
+          "seconds": 1.4051736999999775,
+          "error": null,
+          "reply": "It depends a bit on what you\u2019re building and what you\u2019re comfortable with, but here\u2019s a quick rundown of the most popular Java backend frameworks that you might consider:\n\n| Framework | What it\u2019s good for | Typical Use\u2011Cases | Learning Curve |\n|-----------|--------------------|-------------------|----------------|\n| **Spring Boot** | Mature, battle\u2011tested, huge ecosystem | Monoliths, microservices"
+        },
+        {
+          "provided": [
+            "User prefers Java for backend work"
+          ],
+          "ok": true,
+          "seconds": 1.605478100000255,
+          "error": null,
+          "reply": "It depends a bit on what you\u2019re building and what your priorities are, but here are a few of the most common Java back\u2011end frameworks and when they tend to shine:\n\n| Framework | What it\u2019s good for | Typical use case | Key perks |\n|-----------|--------------------|------------------|-----------|\n| **Spring Boot** | Mature, full\u2011stack, micro\u2011service ready | General\u2011purpose REST APIs, monoliths, ente"
+        }
+      ],
+      "s3": [
+        {
+          "provided": [
+            "User is preparing for a data engineer interview"
+          ],
+          "ok": false,
+          "seconds": 1.9169108000005508,
+          "error": null,
+          "reply": "Here are some practical tips to help you shine in a data\u2011engineer interview:\n\n1. **Refresh Core Concepts**  \n   \u2022\u202fSQL fundamentals: joins, window functions, subqueries, set operations.  \n   \u2022\u202fData modeling: star vs. snowflake, normalization vs. denormalization.  \n   \u2022\u202fETL vs ELT pipelines, data lake vs warehouse trade\u2011offs.  \n   \u2022\u202fBig\u2011data frameworks you\u2019re familiar with (Spark, Flink, Beam).  \n  "
+        },
+        {
+          "provided": [
+            "User is preparing for a data engineer interview"
+          ],
+          "ok": true,
+          "seconds": 1.8123278000002756,
+          "error": null,
+          "reply": "Here are some practical, interview\u2011ready tips for a data engineer role:\n\n| # | Tip | Why it matters | Quick action |\n|---|-----|----------------|--------------|\n| 1 | **Showcase real projects** | Hiring managers want evidence of impact, not just buzzwords. | Add 3\u20114 projects to your r\u00e9sum\u00e9 with metrics (e.g., \u201cscaled nightly data pipeline from 10\u202fGB to 1\u202fTB, reducing latency by 70\u202f%\u201d). |\n| 2 | **M"
+        },
+        {
+          "provided": [
+            "User is preparing for a data engineer interview"
+          ],
+          "ok": false,
+          "seconds": 5.715038000000277,
+          "error": null,
+          "reply": "Here\u2019s a quick, friendly \u201ccheat\u2011sheet\u201d to help you feel confident heading into a data\u2011engineering interview. Feel free to let me know if you\u2019d like to dive deeper into any particular area!\n\n---\n\n## 1\ufe0f\u20e3 Know the Role (and the Company)\n| What to Learn | Why it Matters |\n|---------------|----------------|\n| **Job description** | Pull out the tech stack (Spark, Snowflake, Kafka, etc.) and the required"
+        }
+      ],
+      "s4": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 3.66334949999964,
+          "error": null,
+          "reply": "## What is a Python decorator?\n\nA *decorator* is simply a function that takes another function (or class) as its argument, **wraps** it in some way, and returns a new function (or class) that can be used in place of the original one.\n\nThink of it as a \u201cfunction wrapper\u201d or a \u201cfunction enhancer.\u201d In everyday language you might say you\u2019re *decorating* the function, just as you\u2019d put a pretty ribbon "
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 7.948590099999819,
+          "error": null,
+          "reply": "### In a nutshell\nA **Python decorator** is a function that takes another function (or method) and returns a new function that usually extends or modifies the original one.  \nDecorators let you *wrap* code around a function **without** touching its body, giving you a reusable, clean way to add behaviour.\n\n---\n\n## 1. The building blocks\n\n| Concept | What it is | Why it matters for decorators |\n|---"
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 6.316711399999804,
+          "error": null,
+          "reply": "**Python decorators** let you *modify* or *extend* the behavior of functions (or classes) without changing their actual code.  \nThink of a decorator as a wrapper that sits around a function, does something before or after the wrapped function runs, and then passes the result back.\n\n---\n\n## 1. The basic idea\n\nA decorator is simply a *function* that:\n\n1. **Accepts a function** (the one you want to m"
+        }
+      ],
+      "s5": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 10.718476400000327,
+          "error": null,
+          "reply": "I\u2019m not sure which language you\u2019re thinking of\u2014do you have a few favorites or specific use\u2011cases in mind? If you give me a bit more context (e.g., the type of projects you work on, languages you\u2019ve tried, or any particular features you value), I can help narrow it down!"
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 1.2001175999994302,
+          "error": null,
+          "reply": "I\u2019m not sure\u2014could you tell me a bit about the projects or types of work you\u2019re doing? That\u2019ll help me figure out which language might suit you best."
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 0.7866244999995615,
+          "error": null,
+          "reply": "I\u2019m not sure\u2014could you share a bit about what you\u2019re working on or what you enjoy in programming? For example, are you into web development, data science, systems programming, or something else? Any languages you\u2019ve used before or found particularly appealing? That\u2019ll help me figure out what might suit you best."
+        }
+      ],
+      "s6": [
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": true,
+          "seconds": 2.5302410000003874,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s sketch a practical SQLite schema that\u2019ll keep your chatbot\u2019s data organized without getting too heavy. I\u2019ll start with a core set of tables, then we can tweak it once you let me know what extra features you need (e.g., multi\u2011language support, analytics, or a training pipeline).\n\n---\n\n## 1. Core Data Model\n\n| Table | Purpose | Key Columns | Notes |\n|-------|---------|-------------"
+        },
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": true,
+          "seconds": 2.425122999999985,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s sketch out a solid SQLite schema that\u2019ll cover the most common needs for a chatbot. I\u2019ll start with a quick \u201cstarter kit\u201d layout, and then we can tweak it once you share a bit more about what your bot actually does.\n\n---\n\n## 1. Core Tables (what most bots need)\n\n| Table | Purpose | Key Columns | Notes |\n|-------|---------|-------------|-------|\n| **users** | Store who\u2019s chatting "
+        },
+        {
+          "provided": [
+            "User's chatbot project uses SQLite"
+          ],
+          "ok": true,
+          "seconds": 2.528510100000858,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s start by sketching out the core data you\u2019ll probably need for a chatbot that stores everything in SQLite. I\u2019ll then ask a few questions so we can tailor the design to your exact use\u2011case.\n\n### 1. Basic \u201cstarter\u201d schema\n\n| Table | Purpose | Key columns |\n|-------|---------|-------------|\n| **Users** | Keeps a record of each person interacting with the bot | `id (PK)`, `username`, "
+        }
+      ]
+    },
+    "off": {
+      "s1": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 3.139447999999902,
+          "error": null,
+          "reply": "Below is a flexible outline you can adapt to most chatbot projects.  \nIt assumes a relational database (e.g., PostgreSQL, MySQL, or SQLite), but the same concepts translate to a NoSQL store if that\u2019s what you prefer.\n\n---\n\n## 1. Clarify Your Requirements\n\nBefore diving into tables, please let me know:\n\n| What are you building? | Example | Why it matters |\n|------------------------|---------|------"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 3.0381881000002977,
+          "error": null,
+          "reply": "Sure thing!\u202fLet\u2019s start by getting a bit of context so the design can match your exact needs.\n\n---\n\n## 1. What kind of chatbot are you building?\n\n| Question | Why it matters |\n|----------|----------------|\n| **Is it a customer\u2011service bot, a personal assistant, a FAQ\u2011bot, etc.?** | Different use\u2011cases drive what data you need (e.g., order IDs for a support bot). |\n| **Will it handle multiple langu"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 2.22566949999964,
+          "error": null,
+          "reply": "I\u2019d love to help you sketch out a solid database schema for your chatbot, but a few details will make the advice more useful:\n\n1. **What\u2019s the main purpose of the chatbot?**  \n   *\u202fFAQ\u2011style information retrieval?  \n   *\u202fTransactional (booking, ordering, support)?  \n   *\u202fConversational AI with natural language understanding (NLU)?  \n\n2. **What kind of data do you need to store?**  \n   *\u202fUser profi"
+        }
+      ],
+      "s2": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 1.9155953999998019,
+          "error": null,
+          "reply": "It depends on a few key things\u2014what language you\u2019re comfortable with, the scale of the project, the kind of workload (REST APIs, real\u2011time, heavy computation), how fast you need to iterate, and how active the community is.\n\n### Quick checklist\n\n| Question | What to think about | Possible choices |\n|----------|---------------------|------------------|\n| **Language preference** | Do you already use "
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 1.3051158999996915,
+          "error": null,
+          "reply": "I\u2019d love to give you a solid recommendation, but first I need a bit more context. A few quick questions will help narrow it down:\n\n| What do you need the backend to do? |  \n|------------------------------------|  \n| \u2022 Is it a RESTful API, GraphQL, real\u2011time sockets, batch jobs, or something else? |  \n| \u2022 What kind of data store will you use? (SQL, NoSQL, in\u2011memory, etc.) |  \n| \u2022 Do you have a lang"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 3.2377513000001272,
+          "error": null,
+          "reply": "I\u2019d love to help you pick the best fit, but first could you tell me a bit more about your project?\n\n* What programming language(s) are you comfortable with or planning to use?  \n* Is this a web API, a monolithic app, a microservice, or something else?  \n* Do you need real\u2011time features (WebSockets, streaming)?  \n* What about database choice\u2014relational, NoSQL, or a mix?  \n* Any specific performance"
+        }
+      ],
+      "s3": [
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 5.317455000000336,
+          "error": null,
+          "reply": "Absolutely\u2014here are some practical, universally\u2011applicable interview tips to help you feel confident and make a strong impression.  \nIf you have a specific type of interview in mind (e.g., tech, sales, academic, panel, remote, etc.) just let me know and I can tailor the advice to fit that situation!\n\n---\n\n## 1. Do Your Homework  \n| What to do | Why it matters |\n|------------|----------------|\n| **"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 5.855709600000409,
+          "error": null,
+          "reply": "Sure thing! A few quick, versatile pointers to keep in mind:\n\n| # | Tip | Why It Helps |\n|---|-----|--------------|\n| 1 | **Research the company or program** | Shows genuine interest and lets you tailor your answers. |\n| 2 | **Practice common questions** | Builds confidence and helps you articulate your strengths. |\n| 3 | **Use the STAR method (Situation, Task, Action, Result)** | Keeps your stori"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 1.1987583999998606,
+          "error": null,
+          "reply": "Sure thing! Interview prep can feel like a big deal, but a few clear steps can make it much smoother. To give you the most useful advice, could you let me know a bit about:\n\n1. **The industry or job role** (e.g., software engineering, marketing, sales, academia, etc.)  \n2. **How far along you are** (first\u2011round screening, technical interview, final round, or a follow\u2011up interview)  \n3. **Any speci"
+        }
+      ],
+      "s4": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 7.852421600000525,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s break down Python decorators in a way that feels like a friendly walk-through.\n\n---\n\n## 1. What a Decorator Is\n\nAt its core, a **decorator** is a function that **takes another function as input, adds some extra behavior, and returns a new function**. Think of it like a \u201cwrapper\u201d that sits around the original function to give it extra powers (logging, timing, authentication, etc.)"
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 6.215554499999598,
+          "error": null,
+          "reply": "**Python decorators** are a concise way to modify or extend the behavior of functions, methods, or classes without changing their actual code. Think of them as wrappers that sit around a function and add something before, after, or instead of the original function\u2019s execution.\n\n---\n\n## 1. The Basics\n\n```python\ndef decorator(func):\n    def wrapper(*args, **kwargs):\n        print(\"Before the call\")\n"
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 6.011409100000492,
+          "error": null,
+          "reply": "### Python Decorators in a Nutshell\n\nA *decorator* is a special kind of function that **takes another function (or class) as its argument, does something with it, and returns a new function (or class)**.  \nThink of it like a **wrapper** or a **coat** that adds extra behavior before, after, or around the original piece of code.\n\nBelow is a step\u2011by\u2011step guide that shows how decorators work, why they"
+        }
+      ],
+      "s5": [
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 0.7888748999994277,
+          "error": null,
+          "reply": "I\u2019m not sure\u2014I\u2019d love to hear about your preferences. Which programming language do you most enjoy working with?"
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 1.6068867000003593,
+          "error": null,
+          "reply": "I\u2019m not sure\u2014could you tell me a bit about the languages you\u2019ve worked with or enjoy? That way I can help you figure out what might be your favorite."
+        },
+        {
+          "provided": [],
+          "ok": true,
+          "seconds": 1.0940085000002,
+          "error": null,
+          "reply": "I\u2019m not sure\u2014could you tell me a bit about the languages you\u2019ve used or liked? That\u2019ll help me guess which one you prefer."
+        }
+      ],
+      "s6": [
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 3.556438900000103,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s start by getting a picture of what your chatbot is going to do and what data it will need to keep track of. Once we have that, we can sketch out a database design that scales nicely and keeps everything tidy.\n\n---\n\n## 1. Quick \u201cWhat\u2011to\u2011ask\u201d checklist\n\n| Topic | What I\u2019d like to know |\n|-------|-----------------------|\n| **Chatbot purpose** | Customer support, personal assistant, "
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 9.183312900000601,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s build a solid foundation for your chatbot\u2019s data layer. I\u2019ll give you a flexible \u201cstarter kit\u201d that you can tweak as you learn more about your specific use case, and then we can refine it together.\n\n---\n\n## 1. Quick\u2011start \u201cWhat\u2011You\u2011Need\u201d Checklist\n\n| Category | Typical Data | Why You\u2019ll Need It |\n|----------|--------------|-------------------|\n| **Users / Accounts** | User ID, na"
+        },
+        {
+          "provided": [],
+          "ok": false,
+          "seconds": 14.611256999999569,
+          "error": null,
+          "reply": "Sure thing! Let\u2019s start by getting a clear picture of what your chatbot will need to store, and then we\u2019ll sketch out a database design that\u2019s flexible, scalable, and easy to work with.\n\n---\n\n## 1. Quick Clarifying Questions\n\n| Topic | Questions | Why it matters |\n|-------|-----------|----------------|\n| **Chatbot purpose** | \u2022 Is it for customer support, sales, personal assistant, etc.? <br>\u2022 Wil"
+        }
+      ]
+    }
+  }
+}
