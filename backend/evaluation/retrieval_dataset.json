@@ -1,0 +1,32 @@
+﻿{
+  "note": "Fictional data for evaluation only. No real user information.",
+  "memories": [
+    {"id": "m1", "content": "User prefers Python"},
+    {"id": "m2", "content": "User is learning FastAPI"},
+    {"id": "m3", "content": "User is building a chatbot project"},
+    {"id": "m4", "content": "User prefers short answers"},
+    {"id": "m5", "content": "User wants to learn SQL"},
+    {"id": "m6", "content": "User's goal is to get an AI engineer job"},
+    {"id": "m7", "content": "User likes spicy food"},
+    {"id": "m8", "content": "User is learning guitar"},
+    {"id": "m9", "content": "User uses VS Code"},
+    {"id": "m10", "content": "User is preparing for interviews"}
+  ],
+  "questions": [
+    {"id": "q01", "question": "Can you explain Python decorators?", "expected": ["m1"]},
+    {"id": "q02", "question": "How do I add a route in FastAPI?", "expected": ["m2"]},
+    {"id": "q03", "question": "Help me design the chatbot project architecture", "expected": ["m3"]},
+    {"id": "q04", "question": "Give me a recipe with spicy food", "expected": ["m7"]},
+    {"id": "q05", "question": "What is a good recipe for pasta?", "expected": []},
+    {"id": "q06", "question": "What is the weather today?", "expected": []},
+    {"id": "q07", "question": "Explain SQL joins", "expected": ["m5"]},
+    {"id": "q08", "question": "How should I prepare for interviews?", "expected": ["m10"]},
+    {"id": "q09", "question": "Which coding language do I like?", "expected": ["m1"]},
+    {"id": "q10", "question": "Tips for my AI engineer job search", "expected": ["m6"]},
+    {"id": "q11", "question": "Where do I put my VS Code settings?", "expected": ["m9"]},
+    {"id": "q12", "question": "I want to practice guitar chords", "expected": ["m8"]},
+    {"id": "q13", "question": "What is the best way of learning to cook?", "expected": []},
+    {"id": "q14", "question": "Explain Java streams", "expected": []},
+    {"id": "q15", "question": "Which of my projects should I finish first?", "expected": ["m3"]}
+  ]
+}

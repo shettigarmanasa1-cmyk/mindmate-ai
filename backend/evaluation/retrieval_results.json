@@ -1,0 +1,164 @@
+{
+  "measured_at": "2026-10-19T11:21:45",
+  "metrics": {
+    "precision": 1.0,
+    "recall": 0.909,
+    "false_trigger_rate": 0.0,
+    "questions": 15,
+    "memories": 10,
+    "relevant_retrieved": 10,
+    "retrieved_total": 10,
+    "relevant_total": 11,
+    "no_memory_questions": 4,
+    "false_triggers": 0
+  },
+  "cases": [
+    {
+      "id": "q01",
+      "question": "Can you explain Python decorators?",
+      "expected": [
+        "m1"
+      ],
+      "got": [
+        "m1"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q02",
+      "question": "How do I add a route in FastAPI?",
+      "expected": [
+        "m2"
+      ],
+      "got": [
+        "m2"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q03",
+      "question": "Help me design the chatbot project architecture",
+      "expected": [
+        "m3"
+      ],
+      "got": [
+        "m3"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q04",
+      "question": "Give me a recipe with spicy food",
+      "expected": [
+        "m7"
+      ],
+      "got": [
+        "m7"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q05",
+      "question": "What is a good recipe for pasta?",
+      "expected": [],
+      "got": [],
+      "result": "ok"
+    },
+    {
+      "id": "q06",
+      "question": "What is the weather today?",
+      "expected": [],
+      "got": [],
+      "result": "ok"
+    },
+    {
+      "id": "q07",
+      "question": "Explain SQL joins",
+      "expected": [
+        "m5"
+      ],
+      "got": [
+        "m5"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q08",
+      "question": "How should I prepare for interviews?",
+      "expected": [
+        "m10"
+      ],
+      "got": [
+        "m10"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q09",
+      "question": "Which coding language do I like?",
+      "expected": [
+        "m1"
+      ],
+      "got": [],
+      "result": "DIFF"
+    },
+    {
+      "id": "q10",
+      "question": "Tips for my AI engineer job search",
+      "expected": [
+        "m6"
+      ],
+      "got": [
+        "m6"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q11",
+      "question": "Where do I put my VS Code settings?",
+      "expected": [
+        "m9"
+      ],
+      "got": [
+        "m9"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q12",
+      "question": "I want to practice guitar chords",
+      "expected": [
+        "m8"
+      ],
+      "got": [
+        "m8"
+      ],
+      "result": "ok"
+    },
+    {
+      "id": "q13",
+      "question": "What is the best way of learning to cook?",
+      "expected": [],
+      "got": [],
+      "result": "ok"
+    },
+    {
+      "id": "q14",
+      "question": "Explain Java streams",
+      "expected": [],
+      "got": [],
+      "result": "ok"
+    },
+    {
+      "id": "q15",
+      "question": "Which of my projects should I finish first?",
+      "expected": [
+        "m3"
+      ],
+      "got": [
+        "m3"
+      ],
+      "result": "ok"
+    }
+  ]
+}
