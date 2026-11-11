@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+﻿import { useCallback, useEffect, useState } from 'react'
 import Chat from './components/Chat'
 import MemoryPanel from './components/MemoryPanel'
 import PrivacyPanel from './components/PrivacyPanel'
 import SettingsPanel from './components/SettingsPanel'
 import Sidebar from './components/Sidebar'
+import ThemeSwitch from './components/ThemeSwitch'
+import { AppearanceProvider } from './lib/AppearanceContext'
 import {
   deleteConversation,
   listConversations,
@@ -22,7 +24,7 @@ const TABS: { id: View; label: string }[] = [
   { id: 'privacy', label: 'Privacy' },
 ]
 
-export default function App() {
+function AppShell() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -96,6 +98,7 @@ export default function App() {
               {tab.label}
             </button>
           ))}
+          <ThemeSwitch />
         </div>
         <div className="pane" hidden={view !== 'chat'}>
           <Chat
@@ -119,5 +122,13 @@ export default function App() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function App() {
+  return (
+    <AppearanceProvider>
+      <AppShell />
+    </AppearanceProvider>
   )
 }

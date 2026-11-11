@@ -1,13 +1,25 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>mindmate-ai</title>
-  </head>
+  <script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('mindmate-appearance');
+      var a = raw ? JSON.parse(raw) : {};
+      var mode = a.mode === 'dark' || a.mode === 'system' ? a.mode : 'light';
+      var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+      if (/^#[0-9a-fA-F]{6}$/.test(a.accent || '')) document.documentElement.style.setProperty('--accent', a.accent);
+    } catch (e) {}
+  })();
+</script></head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+

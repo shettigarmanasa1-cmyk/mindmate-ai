@@ -55,3 +55,38 @@ input:focus-visible {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+/* ---------- Themes and accent color ---------- */
+:root {
+  color-scheme: light;
+  --accent: #7c3aed;
+  --accent-text: #ffffff;
+  --user-bg: var(--accent);
+  --link: var(--accent);
+  --error-bg: #fef3f2;
+  --error-border: #fecdca;
+  --success-fg: #067647;
+  --success-bg: #ecfdf3;
+  --success-border: #abefc6;
+  --suggest-bg: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  --suggest-border: color-mix(in srgb, var(--accent) 35%, var(--surface));
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0f1115;
+  --surface: #171a21;
+  --text: #e8eaf0;
+  --muted: #9aa3b5;
+  --border: #2b3040;
+  --assistant-bg: #212633;
+  --danger: #f97066;
+  --code-bg: #0b0d12;
+  --link: color-mix(in srgb, var(--accent) 60%, white);
+  --error-bg: #2b1512;
+  --error-border: #7a271a;
+  --success-fg: #47cd89;
+  --success-bg: #0b2a1c;
+  --success-border: #14532d;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}

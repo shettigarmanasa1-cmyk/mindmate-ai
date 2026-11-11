@@ -759,3 +759,151 @@
   color: var(--text);
   border-color: var(--accent);
 }
+
+/* ---------- Theme-aware colors and Appearance settings ---------- */
+.error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+}
+
+.success {
+  color: var(--success-fg);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+
+.suggestion {
+  background: var(--suggest-bg);
+  border-color: var(--suggest-border);
+}
+
+.markdown a,
+.preview a {
+  color: var(--link);
+}
+
+input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+.tabs {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.theme-switch {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  margin-bottom: 6px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.theme-switch button,
+.segmented button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+.theme-switch button[aria-pressed='true'],
+.segmented button[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.page-panel .settings-section h3 {
+  margin: 0;
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  width: fit-content;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.swatch {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 2px var(--surface);
+}
+
+.swatch[aria-pressed='true'] {
+  border-color: var(--text);
+}
+
+.custom-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-color input[type='color'] {
+  width: 44px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.bubble-user {
+  align-self: flex-end;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--user-bg);
+  color: var(--accent-text);
+}
+
+.bubble-ai {
+  align-self: flex-start;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--assistant-bg);
+}
+
+.preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
