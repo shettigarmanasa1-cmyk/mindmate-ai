@@ -1,7 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
+import Markdown from './Markdown'
 import SuggestionCard from './SuggestionCard'
 import { getConversation, sendChat } from '../lib/api'
 import type { ChatMessage, Proposal, ProvidedMemory } from '../lib/api'
+
+// Copies the whole reply as written (Markdown symbols included).
+function CopyReplyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // The browser may block clipboard access. Nothing else to do.
+    }
+  }
+
+  return (
+    <button type="button" className="reply-copy" onClick={copy} aria-label="Copy the whole reply">
+      {copied ? 'Copied' : 'Copy reply'}
+    </button>
+  )
+}
 
 interface Props {
   conversationId: string | null
@@ -108,7 +130,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
           return (
             <div key={m.id} className={`message ${m.role}`}>
               <span className="who">{m.role === 'user' ? 'You' : 'MindMate'}</span>
-              <p>{m.content}</p>
+              {m.role === 'assistant' ? <Markdown text={m.content} /> : <p>{m.content}</p>}
               {used.length > 0 && (
                 <details className="provided">
                   <summary>
@@ -128,6 +150,11 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
                     Provided means sent with your question. The AI may not have used it.
                   </p>
                 </details>
+              )}
+              {m.role === 'assistant' && (
+                <div className="reply-actions">
+                  <CopyReplyButton text={m.content} />
+                </div>
               )}
             </div>
           )
