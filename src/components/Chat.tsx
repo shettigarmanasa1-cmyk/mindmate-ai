@@ -4,6 +4,13 @@ import SuggestionCard from './SuggestionCard'
 import { getConversation, sendChat } from '../lib/api'
 import type { ChatMessage, Proposal, ProvidedMemory } from '../lib/api'
 
+const SUGGESTIONS = [
+  'Explain Python decorators in simple words',
+  'Help me plan a small FastAPI project',
+  'Give me tips for an AI engineer interview',
+  'Explain SQL joins with an example',
+]
+
 // Copies the whole reply as written (Markdown symbols included).
 function CopyReplyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
@@ -74,9 +81,8 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, suggestions, loading])
 
-  async function handleSend(event: React.FormEvent) {
-    event.preventDefault()
-    const text = input.trim()
+  async function send(raw: string) {
+    const text = raw.trim()
     if (!text || loading) return
 
     setError(null)
@@ -115,21 +121,54 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
     }
   }
 
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    send(input)
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+      event.preventDefault()
+      send(input)
+    }
+  }
+
   return (
     <section className="chat" aria-label="Chat">
-      <header className="chat-header">
-        <h1>MindMate AI</h1>
-      </header>
+      <h1 className="sr-only">MindMate AI chat</h1>
 
       <div className="messages" aria-live="polite">
         {messages.length === 0 && !loading && !error && (
-          <p className="empty">Say hello to start a conversation.</p>
+          <div className="empty-state">
+            <span className="brand-mark large" aria-hidden="true">
+              M
+            </span>
+            <h2>How can I help today?</h2>
+            <p>
+              Ask anything. MindMate can remember useful things about you, but only after you approve them.
+            </p>
+            <div className="prompt-grid">
+              {SUGGESTIONS.map((suggestion) => (
+                <button key={suggestion} type="button" className="prompt-card" onClick={() => send(suggestion)}>
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
+
         {messages.map((m) => {
           const used = provided[m.id] ?? []
           return (
             <div key={m.id} className={`message ${m.role}`}>
-              <span className="who">{m.role === 'user' ? 'You' : 'MindMate'}</span>
+              <span className="who">
+                {m.role === 'assistant' && (
+                  <span className="avatar" aria-hidden="true">
+                    M
+                  </span>
+                )}
+                {m.role === 'user' ? 'You' : 'MindMate'}
+              </span>
               {m.role === 'assistant' ? <Markdown text={m.content} /> : <p>{m.content}</p>}
               {used.length > 0 && (
                 <details className="provided">
@@ -159,6 +198,7 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
             </div>
           )
         })}
+
         {suggestions.map((proposal) => (
           <SuggestionCard
             key={proposal.id}
@@ -169,7 +209,15 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
             }}
           />
         ))}
-        {loading && <p className="loading">MindMate is thinking...</p>}
+
+        {loading && (
+          <div className="typing" role="status" aria-label="MindMate is thinking">
+            <span />
+            <span />
+            <span />
+          </div>
+        )}
+
         {error && (
           <p className="error" role="alert">
             {error}
@@ -178,24 +226,26 @@ export default function Chat({ conversationId, onConversationChange, onActivity,
         <div ref={bottomRef} />
       </div>
 
-      <form className="composer" onSubmit={handleSend}>
+      <form className="composer" onSubmit={handleSubmit}>
         <label htmlFor="message-input" className="sr-only">
           Your message
         </label>
-        <input
+        <textarea
           id="message-input"
-          type="text"
+          rows={1}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
+          onKeyDown={handleKeyDown}
+          placeholder="Message MindMate..."
           maxLength={4000}
-          disabled={loading}
+          readOnly={loading}
           autoComplete="off"
         />
-        <button type="submit" disabled={loading || !input.trim()}>
+        <button type="submit" className="send-btn" disabled={loading || !input.trim()}>
           Send
         </button>
       </form>
+      <p className="composer-hint">Enter to send, Shift+Enter for a new line</p>
     </section>
   )
 }

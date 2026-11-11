@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import type { Conversation } from '../lib/api'
 
 interface Props {
@@ -76,6 +76,7 @@ export default function Sidebar({
 
   return (
     <nav className="sidebar" aria-label="Conversations">
+      <div className="brand"><span className="brand-mark" aria-hidden="true">M</span><span className="brand-name">MindMate AI</span></div>
       <button type="button" className="new-btn" onClick={onNew}>
         New conversation
       </button>

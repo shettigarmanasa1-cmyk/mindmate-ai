@@ -907,3 +907,259 @@ input[type='checkbox'] {
   align-items: center;
   gap: 12px;
 }
+
+/* ---------- Chat redesign ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px 6px;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.brand-mark.large {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  font-size: 1.5rem;
+}
+
+.brand-name {
+  font-weight: 650;
+  font-size: 1.05rem;
+}
+
+.new-btn {
+  box-shadow: var(--shadow);
+  transition: filter 0.15s ease;
+}
+
+.new-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.conv {
+  transition: background 0.15s ease;
+}
+
+.conv:hover {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.conv.active {
+  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
+}
+
+.sidebar input[type='search']:focus-visible,
+.composer textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.messages {
+  padding: 24px max(20px, calc((100% - 820px) / 2));
+}
+
+.message {
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  animation: rise 0.2s ease-out;
+}
+
+.message.user {
+  border-bottom-right-radius: 6px;
+}
+
+.message.assistant {
+  color: var(--text);
+  border-bottom-left-radius: 6px;
+}
+
+.message .who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 1;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.empty-state {
+  margin: auto;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-top: 14px;
+}
+
+.prompt-card {
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.prompt-card:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.typing {
+  align-self: flex-start;
+  display: flex;
+  gap: 5px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--assistant-bg);
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .typing span {
+    animation: none;
+  }
+}
+
+.provided {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.provided summary {
+  display: inline-block;
+  cursor: pointer;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--text);
+}
+
+.provided[open] summary {
+  margin-bottom: 4px;
+}
+
+.composer {
+  align-items: flex-end;
+  padding: 14px max(20px, calc((100% - 820px) / 2)) 4px;
+  border-top: none;
+}
+
+.composer textarea {
+  flex: 1;
+  font: inherit;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  resize: none;
+  max-height: 160px;
+  field-sizing: content;
+}
+
+.send-btn {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+  border-radius: 12px;
+  padding: 11px 18px;
+  font-weight: 600;
+}
+
+.composer-hint {
+  margin: 0;
+  padding: 0 max(20px, calc((100% - 820px) / 2)) 12px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .prompt-grid {
+    grid-template-columns: 1fr;
+  }
+}
