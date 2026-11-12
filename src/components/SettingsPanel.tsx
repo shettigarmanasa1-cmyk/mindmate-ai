@@ -23,6 +23,12 @@ export default function SettingsPanel() {
       .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings.'))
   }, [])
 
+  // auto-hide: the "Saved" note disappears by itself.
+  useEffect(() => {
+    if (status !== 'Saved') return
+    const timer = setTimeout(() => setStatus(null), 2500)
+    return () => clearTimeout(timer)
+  }, [status])
   async function change(changes: Partial<AppSettings>) {
     setError(null)
     setStatus('Saving...')
@@ -194,3 +200,4 @@ export default function SettingsPanel() {
     </section>
   )
 }
+

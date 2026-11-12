@@ -1,5 +1,6 @@
 ﻿import { useCallback, useEffect, useState } from 'react'
 import Chat from './components/Chat'
+import Icon from './components/Icon'
 import MemoryPanel from './components/MemoryPanel'
 import PrivacyPanel from './components/PrivacyPanel'
 import SettingsPanel from './components/SettingsPanel'
@@ -31,6 +32,7 @@ function AppShell() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [view, setView] = useState<View>('chat')
   const [memoryVersion, setMemoryVersion] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const bumpMemory = useCallback(() => setMemoryVersion((v) => v + 1), [])
 
@@ -50,6 +52,16 @@ function AppShell() {
     return () => clearTimeout(timer)
   }, [refresh])
 
+  // On small screens, Esc closes the slide-in menu.
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [sidebarOpen])
+
   async function handleRename(id: string, title: string) {
     await renameConversation(id, title)
     await refresh()
@@ -68,25 +80,45 @@ function AppShell() {
 
   return (
     <main className="app">
-      <Sidebar
-        conversations={conversations}
-        activeId={activeId}
-        search={search}
-        loadError={loadError}
-        onSearchChange={setSearch}
-        onSelect={(id) => {
-          setActiveId(id)
-          setView('chat')
-        }}
-        onNew={() => {
-          setActiveId(null)
-          setView('chat')
-        }}
-        onRename={handleRename}
-        onDelete={handleDelete}
-      />
+      <div className={sidebarOpen ? 'sidebar-wrap open' : 'sidebar-wrap'}>
+        <Sidebar
+          conversations={conversations}
+          activeId={activeId}
+          search={search}
+          loadError={loadError}
+          onSearchChange={setSearch}
+          onSelect={(id) => {
+            setActiveId(id)
+            setView('chat')
+            setSidebarOpen(false)
+          }}
+          onNew={() => {
+            setActiveId(null)
+            setView('chat')
+            setSidebarOpen(false)
+          }}
+          onRename={handleRename}
+          onDelete={handleDelete}
+        />
+      </div>
+      {sidebarOpen && (
+        <button
+          type="button"
+          className="backdrop"
+          aria-label="Close conversations"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <div className="main-col">
         <div className="tabs" role="navigation" aria-label="Sections">
+          <button
+            type="button"
+            className="menu-btn"
+            aria-label="Open conversations"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Icon name="menu" size={18} />
+          </button>
           {TABS.map((tab) => (
             <button
               key={tab.id}

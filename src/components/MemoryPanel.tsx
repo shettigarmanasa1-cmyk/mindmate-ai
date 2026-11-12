@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+﻿import { useCallback, useEffect, useState } from 'react'
+import ConfirmDialog from './ConfirmDialog'
 import SuggestionCard from './SuggestionCard'
 import {
   clearMemories,
@@ -26,6 +27,7 @@ export default function MemoryPanel({ version, onChange }: Props) {
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const [newText, setNewText] = useState('')
   const [newCategory, setNewCategory] = useState('general')
@@ -33,8 +35,9 @@ export default function MemoryPanel({ version, onChange }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
   const [draftCategory, setDraftCategory] = useState('general')
-  const [confirmingId, setConfirmingId] = useState<string | null>(null)
-  const [confirmingClear, setConfirmingClear] = useState(false)
+
+  const [pendingDelete, setPendingDelete] = useState<Memory | null>(null)
+  const [confirmClear, setConfirmClear] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -52,11 +55,25 @@ export default function MemoryPanel({ version, onChange }: Props) {
     load()
   }, [load, version])
 
-  async function run(action: () => Promise<unknown>, after?: () => void) {
+  // auto-hide: messages disappear by themselves after a few seconds.
+  useEffect(() => {
+    if (!notice) return
+    const timer = setTimeout(() => setNotice(null), 4000)
+    return () => clearTimeout(timer)
+  }, [notice])
+
+  useEffect(() => {
+    if (!error) return
+    const timer = setTimeout(() => setError(null), 6000)
+    return () => clearTimeout(timer)
+  }, [error])
+  async function run(action: () => Promise<unknown>, done: string, after?: () => void) {
     setError(null)
+    setNotice(null)
     try {
       await action()
       after?.()
+      setNotice(done)
       onChange()
     } catch (err) {
       setError(messageOf(err))
@@ -67,34 +84,41 @@ export default function MemoryPanel({ version, onChange }: Props) {
     event.preventDefault()
     const text = newText.trim()
     if (!text) {
+      setNotice(null)
       setError('Enter a memory to save.')
       return
     }
-    await run(() => createMemory(text, newCategory), () => setNewText(''))
+    await run(() => createMemory(text, newCategory), 'Memory added.', () => setNewText(''))
   }
 
   function startEdit(memory: Memory) {
-    setConfirmingId(null)
     setEditingId(memory.id)
     setDraft(memory.content)
     setDraftCategory(memory.category)
     setError(null)
+    setNotice(null)
   }
 
   async function saveEdit(event: React.FormEvent) {
     event.preventDefault()
     const text = draft.trim()
     if (!editingId || !text) {
+      setNotice(null)
       setError('Enter some text for this memory.')
       return
     }
-    await run(() => updateMemory(editingId, text, draftCategory), () => setEditingId(null))
+    await run(() => updateMemory(editingId, text, draftCategory), 'Memory updated.', () => setEditingId(null))
   }
 
-  function startDelete(id: string) {
-    setEditingId(null)
-    setConfirmingId(id)
-    setError(null)
+  async function confirmDeleteOne() {
+    const target = pendingDelete
+    setPendingDelete(null)
+    if (target) await run(() => deleteMemory(target.id), 'Memory deleted.')
+  }
+
+  async function confirmClearAll() {
+    setConfirmClear(false)
+    await run(() => clearMemories(), 'All memories cleared.')
   }
 
   const shownError = error ?? loadError
@@ -102,37 +126,28 @@ export default function MemoryPanel({ version, onChange }: Props) {
   return (
     <section className="memory-panel" aria-label="Your memories">
       <div className="panel-head">
-        <h2>Your memories</h2>
-        {memories.length > 0 &&
-          (confirmingClear ? (
-            <span className="inline-confirm">
-              Delete all {memories.length}?
-              <button
-                type="button"
-                className="mini-btn danger"
-                onClick={() => run(() => clearMemories(), () => setConfirmingClear(false))}
-              >
-                Delete all
-              </button>
-              <button type="button" className="mini-btn" onClick={() => setConfirmingClear(false)}>
-                Keep
-              </button>
-            </span>
-          ) : (
-            <button type="button" className="mini-btn danger" onClick={() => setConfirmingClear(true)}>
-              Clear all
-            </button>
-          ))}
+        <div>
+          <h2>Your memories</h2>
+          <p className="hint">
+            A memory is saved only after you approve it. Saved memories live in this app's local database.
+            Relevant ones are sent to the AI provider along with your question.
+          </p>
+        </div>
+        {memories.length > 0 && (
+          <button type="button" className="danger-btn" onClick={() => setConfirmClear(true)}>
+            Clear all
+          </button>
+        )}
       </div>
-
-      <p className="hint">
-        A memory is only saved after you approve it. Saved memories live in this app's local database.
-        Relevant ones are sent to the AI provider along with your question.
-      </p>
 
       {shownError && (
         <p className="error" role="alert">
           {shownError}
+        </p>
+      )}
+      {notice && !shownError && (
+        <p className="success" role="status">
+          {notice}
         </p>
       )}
 
@@ -145,40 +160,45 @@ export default function MemoryPanel({ version, onChange }: Props) {
         </div>
       )}
 
-      <form className="mem-add" onSubmit={handleAdd}>
-        <label htmlFor="new-memory" className="sr-only">
-          New memory
-        </label>
-        <input
-          id="new-memory"
-          value={newText}
-          onChange={(e) => setNewText(e.target.value)}
-          placeholder="Add a memory, like: User is learning SQL"
-          maxLength={300}
-          autoComplete="off"
-        />
-        <label htmlFor="new-category" className="sr-only">
-          Category
-        </label>
-        <select id="new-category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)}>
-          {CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Add</button>
+      <form className="card mem-form" onSubmit={handleAdd}>
+        <h3>Add a memory</h3>
+        <div className="mem-add">
+          <label htmlFor="new-memory" className="sr-only">
+            New memory
+          </label>
+          <input
+            id="new-memory"
+            value={newText}
+            onChange={(e) => setNewText(e.target.value)}
+            placeholder="For example: User is learning SQL"
+            maxLength={300}
+            autoComplete="off"
+          />
+          <label htmlFor="new-category" className="sr-only">
+            Category
+          </label>
+          <select id="new-category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)}>
+            {CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="primary-btn">
+            Add
+          </button>
+        </div>
       </form>
 
       {memories.length === 0 ? (
-        <div>
+        <div className="card empty-card">
           <h3>No saved memories yet</h3>
           <p className="hint">Chat with MindMate and approve its suggestions, or add one above.</p>
         </div>
       ) : (
         <ul className="mem-list">
           {memories.map((memory) => (
-            <li key={memory.id} className="mem-item">
+            <li key={memory.id} className="mem-card">
               {editingId === memory.id ? (
                 <form className="mem-edit" onSubmit={saveEdit}>
                   <label htmlFor={'edit-' + memory.id} className="sr-only">
@@ -205,53 +225,57 @@ export default function MemoryPanel({ version, onChange }: Props) {
                       </option>
                     ))}
                   </select>
-                  <button type="submit" className="mini-btn">
+                  <button type="submit" className="primary-btn">
                     Save
                   </button>
-                  <button type="button" className="mini-btn" onClick={() => setEditingId(null)}>
+                  <button type="button" onClick={() => setEditingId(null)}>
                     Cancel
                   </button>
                 </form>
-              ) : confirmingId === memory.id ? (
-                <div className="inline-confirm">
-                  <span className="mem-text">Delete "{memory.content}"?</span>
-                  <button
-                    type="button"
-                    className="mini-btn danger"
-                    onClick={() => run(() => deleteMemory(memory.id), () => setConfirmingId(null))}
-                  >
-                    Delete
-                  </button>
-                  <button type="button" className="mini-btn" onClick={() => setConfirmingId(null)}>
-                    Keep
-                  </button>
-                </div>
               ) : (
                 <>
                   <span className="mem-text">{memory.content}</span>
                   <span className="badge">{memory.category}</span>
-                  <button
-                    type="button"
-                    className="mini-btn"
-                    onClick={() => startEdit(memory)}
-                    aria-label={'Edit ' + memory.content}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="mini-btn danger"
-                    onClick={() => startDelete(memory.id)}
-                    aria-label={'Delete ' + memory.content}
-                  >
-                    Delete
-                  </button>
+                  <div className="mem-actions">
+                    <button type="button" onClick={() => startEdit(memory)} aria-label={'Edit ' + memory.content}>
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="danger-btn"
+                      onClick={() => setPendingDelete(memory)}
+                      aria-label={'Delete ' + memory.content}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </>
               )}
             </li>
           ))}
         </ul>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this memory?"
+        message={pendingDelete ? '"' + pendingDelete.content + '" will be removed. This cannot be undone.' : ''}
+        confirmLabel="Delete"
+        danger
+        onConfirm={confirmDeleteOne}
+        onCancel={() => setPendingDelete(null)}
+      />
+
+      <ConfirmDialog
+        open={confirmClear}
+        title="Clear all memories?"
+        message={'All ' + memories.length + ' saved memories will be removed. Your conversations are not affected.'}
+        confirmLabel="Clear all"
+        danger
+        onConfirm={confirmClearAll}
+        onCancel={() => setConfirmClear(false)}
+      />
     </section>
   )
 }
+
