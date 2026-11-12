@@ -1401,3 +1401,112 @@ dialog.confirm::backdrop {
     max-width: 94%;
   }
 }
+
+/* ---------- Math rendering ---------- */
+.markdown .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+  margin: 0.8em 0;
+}
+
+.markdown .katex {
+  font-size: 1.08em;
+}
+
+.markdown td .katex,
+.markdown th .katex {
+  font-size: 1em;
+}
+
+.markdown .katex-error {
+  color: var(--danger);
+}
+
+/* ---------- Sidebar menu and collapse ---------- */
+.menu-btn {
+  display: inline-flex;
+}
+
+@media (min-width: 801px) {
+  .app.collapsed .sidebar-wrap {
+    display: none;
+  }
+}
+
+.conv {
+  position: relative;
+}
+
+.conv.active {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.conv-title {
+  font-size: 0.92rem;
+}
+
+.conv-more-wrap {
+  position: relative;
+  display: flex;
+}
+
+.conv-more {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 4px 6px;
+  border-radius: 8px;
+  opacity: 0;
+}
+
+.conv:hover .conv-more,
+.conv.active .conv-more,
+.conv-more:focus-visible,
+.conv-more[aria-expanded='true'] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .conv-more {
+    opacity: 1;
+  }
+}
+
+.conv-more:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text);
+}
+
+.conv-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.conv-menu button {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.conv-menu button:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.conv-menu .danger {
+  color: var(--danger);
+}

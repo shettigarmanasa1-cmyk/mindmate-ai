@@ -1,8 +1,34 @@
 ﻿import { useRef, useState } from 'react'
 import type { ComponentPropsWithoutRef } from 'react'
 import ReactMarkdown from 'react-markdown'
+import type { Options } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import rehypeHighlight from 'rehype-highlight'
+import 'katex/dist/katex.min.css'
+
+const remarkPlugins: Options['remarkPlugins'] = [remarkGfm, remarkMath]
+
+// Math first, so formulas are drawn before code highlighting runs.
+const rehypePlugins: Options['rehypePlugins'] = [
+  [rehypeKatex, { throwOnError: false, strict: 'ignore' }],
+  [rehypeHighlight, { ignoreMissing: true }],
+]
+
+// AI models often write \( ... \) and \[ ... \] for math. The renderer wants
+// $ ... $ and $$ ... $$, so convert them. Code blocks are left untouched.
+function normalizeMath(text: string) {
+  return text
+    .split(/(```[\s\S]*?```|~~~[\s\S]*?~~~|`[^`\n]+`)/g)
+    .map((part, index) => {
+      if (index % 2 === 1) return part
+      return part
+        .replace(/\\\[([\s\S]+?)\\\]/g, (_, m: string) => '\n$$\n' + m.trim() + '\n$$\n')
+        .replace(/\\\(([\s\S]+?)\\\)/g, (_, m: string) => '$' + m.trim() + '$')
+    })
+    .join('')
+}
 
 // A code block with a Copy button.
 function CodeBlock({ children }: ComponentPropsWithoutRef<'pre'>) {
@@ -38,8 +64,8 @@ export default function Markdown({ text }: Props) {
   return (
     <div className="markdown">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[[rehypeHighlight, { ignoreMissing: true }]]}
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
         components={{
           pre: CodeBlock,
           a: ({ href, children }) => (
@@ -54,7 +80,7 @@ export default function Markdown({ text }: Props) {
           ),
         }}
       >
-        {text}
+        {normalizeMath(text)}
       </ReactMarkdown>
     </div>
   )

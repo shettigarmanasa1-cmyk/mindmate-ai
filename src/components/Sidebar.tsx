@@ -1,4 +1,5 @@
-﻿import { useState } from 'react'
+﻿import { useEffect, useState } from 'react'
+import ConfirmDialog from './ConfirmDialog'
 import type { Conversation } from '../lib/api'
 
 interface Props {
@@ -30,19 +31,39 @@ export default function Sidebar({
 }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
-  const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const [menuId, setMenuId] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Conversation | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Close the three-dot menu when clicking elsewhere or pressing Esc.
+  useEffect(() => {
+    if (!menuId) return
+    const onDown = (event: MouseEvent) => {
+      const target = event.target as Element | null
+      if (!target?.closest('[data-conv-menu]')) setMenuId(null)
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuId(null)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [menuId])
+
+  // Error messages disappear by themselves.
+  useEffect(() => {
+    if (!error) return
+    const timer = setTimeout(() => setError(null), 6000)
+    return () => clearTimeout(timer)
+  }, [error])
+
   function startEdit(conversation: Conversation) {
-    setConfirmingId(null)
+    setMenuId(null)
     setEditingId(conversation.id)
     setDraft(conversation.title)
-    setError(null)
-  }
-
-  function startDelete(id: string) {
-    setEditingId(null)
-    setConfirmingId(id)
     setError(null)
   }
 
@@ -62,10 +83,12 @@ export default function Sidebar({
     }
   }
 
-  async function confirmDelete(id: string) {
+  async function confirmDelete() {
+    const target = pendingDelete
+    setPendingDelete(null)
+    if (!target) return
     try {
-      await onDelete(id)
-      setConfirmingId(null)
+      await onDelete(target.id)
       setError(null)
     } catch (err) {
       setError(messageOf(err))
@@ -76,7 +99,13 @@ export default function Sidebar({
 
   return (
     <nav className="sidebar" aria-label="Conversations">
-      <div className="brand"><span className="brand-mark" aria-hidden="true">M</span><span className="brand-name">MindMate AI</span></div>
+      <div className="brand">
+        <span className="brand-mark" aria-hidden="true">
+          M
+        </span>
+        <span className="brand-name">MindMate AI</span>
+      </div>
+
       <button type="button" className="new-btn" onClick={onNew}>
         New conversation
       </button>
@@ -128,16 +157,6 @@ export default function Sidebar({
                   Cancel
                 </button>
               </form>
-            ) : confirmingId === c.id ? (
-              <div className="conv-confirm">
-                <span>Delete this chat?</span>
-                <button type="button" className="mini-btn danger" onClick={() => confirmDelete(c.id)}>
-                  Delete
-                </button>
-                <button type="button" className="mini-btn" onClick={() => setConfirmingId(null)}>
-                  Keep
-                </button>
-              </div>
             ) : (
               <>
                 <button
@@ -149,27 +168,55 @@ export default function Sidebar({
                 >
                   {c.title}
                 </button>
-                <button
-                  type="button"
-                  className="mini-btn"
-                  onClick={() => startEdit(c)}
-                  aria-label={'Rename ' + c.title}
-                >
-                  Rename
-                </button>
-                <button
-                  type="button"
-                  className="mini-btn danger"
-                  onClick={() => startDelete(c.id)}
-                  aria-label={'Delete ' + c.title}
-                >
-                  Delete
-                </button>
+                <span className="conv-more-wrap" data-conv-menu>
+                  <button
+                    type="button"
+                    className="conv-more"
+                    aria-label={'Actions for ' + c.title}
+                    aria-haspopup="menu"
+                    aria-expanded={menuId === c.id}
+                    onClick={() => setMenuId(menuId === c.id ? null : c.id)}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <circle cx="5" cy="12" r="2" />
+                      <circle cx="12" cy="12" r="2" />
+                      <circle cx="19" cy="12" r="2" />
+                    </svg>
+                  </button>
+                  {menuId === c.id && (
+                    <div className="conv-menu" role="menu">
+                      <button type="button" role="menuitem" onClick={() => startEdit(c)}>
+                        Rename
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className="danger"
+                        onClick={() => {
+                          setMenuId(null)
+                          setPendingDelete(c)
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </span>
               </>
             )}
           </li>
         ))}
       </ul>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="Delete this chat?"
+        message={pendingDelete ? '"' + pendingDelete.title + '" and its messages will be removed. This cannot be undone.' : ''}
+        confirmLabel="Delete"
+        danger
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </nav>
   )
 }

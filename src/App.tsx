@@ -25,6 +25,16 @@ const TABS: { id: View; label: string }[] = [
   { id: 'privacy', label: 'Privacy' },
 ]
 
+const COLLAPSE_KEY = 'mindmate-sidebar-collapsed'
+
+function loadCollapsed() {
+  try {
+    return localStorage.getItem(COLLAPSE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 function AppShell() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -33,6 +43,7 @@ function AppShell() {
   const [view, setView] = useState<View>('chat')
   const [memoryVersion, setMemoryVersion] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState<boolean>(loadCollapsed)
 
   const bumpMemory = useCallback(() => setMemoryVersion((v) => v + 1), [])
 
@@ -62,6 +73,24 @@ function AppShell() {
     return () => window.removeEventListener('keydown', onKey)
   }, [sidebarOpen])
 
+  // On a phone this opens or closes the slide-in menu. On a bigger screen it
+  // hides or shows the sidebar and remembers the choice.
+  function toggleSidebar() {
+    if (window.matchMedia('(max-width: 800px)').matches) {
+      setSidebarOpen((open) => !open)
+      return
+    }
+    setCollapsed((value) => {
+      const next = !value
+      try {
+        localStorage.setItem(COLLAPSE_KEY, next ? '1' : '0')
+      } catch {
+        // Storage can be blocked. The sidebar still toggles for this visit.
+      }
+      return next
+    })
+  }
+
   async function handleRename(id: string, title: string) {
     await renameConversation(id, title)
     await refresh()
@@ -79,7 +108,7 @@ function AppShell() {
   }
 
   return (
-    <main className="app">
+    <main className={collapsed ? 'app collapsed' : 'app'}>
       <div className={sidebarOpen ? 'sidebar-wrap open' : 'sidebar-wrap'}>
         <Sidebar
           conversations={conversations}
@@ -114,8 +143,9 @@ function AppShell() {
           <button
             type="button"
             className="menu-btn"
-            aria-label="Open conversations"
-            onClick={() => setSidebarOpen(true)}
+            aria-label="Show or hide conversations"
+            title="Show or hide conversations"
+            onClick={toggleSidebar}
           >
             <Icon name="menu" size={18} />
           </button>
