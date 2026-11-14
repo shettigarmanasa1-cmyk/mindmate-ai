@@ -1,7 +1,13 @@
-﻿import { useEffect, useState } from 'react'
+﻿
+import { useEffect, useState } from 'react'
 import ConfirmDialog from './ConfirmDialog'
 import Icon from './Icon'
-import { clearMemories, deleteAllConversations, exportData, getDataInfo } from '../lib/api'
+import {
+  clearMemories,
+  deleteAllConversations,
+  exportData,
+  getDataInfo,
+} from '../lib/api'
 import type { DataInfo } from '../lib/api'
 
 interface Props {
@@ -9,45 +15,68 @@ interface Props {
   onMemoryChange: () => void
 }
 
-export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }: Props) {
+export default function PrivacyPanel({
+  onConversationsDeleted,
+  onMemoryChange,
+}: Props) {
   const [info, setInfo] = useState<DataInfo | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
-  const [confirming, setConfirming] = useState<'chats' | 'memories' | null>(null)
+  const [confirming, setConfirming] = useState<'chats' | 'memories' | null>(
+    null
+  )
 
   useEffect(() => {
     getDataInfo()
       .then(setInfo)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load this information.'))
+      .catch((err) =>
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Could not load this information.'
+        )
+      )
   }, [])
 
-  // auto-hide: messages disappear by themselves after a few seconds.
+  // Automatically hide success messages.
   useEffect(() => {
     if (!message) return
     const timer = setTimeout(() => setMessage(null), 5000)
     return () => clearTimeout(timer)
   }, [message])
 
+  // Automatically hide errors after a few seconds.
   useEffect(() => {
     if (!error || !info) return
     const timer = setTimeout(() => setError(null), 6000)
     return () => clearTimeout(timer)
   }, [error, info])
+
   async function handleExport() {
     setError(null)
     setMessage(null)
+
     try {
       const data = await exportData()
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
+
       link.href = url
       link.download = 'mindmate-export.json'
       link.click()
+
       URL.revokeObjectURL(url)
-      setMessage('Export downloaded. It contains your full chat text, so keep it private.')
+
+      setMessage(
+        'Export downloaded. It contains your full chat text, so keep it private.'
+      )
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not export your data.')
+      setError(
+        err instanceof Error ? err.message : 'Could not export your data.'
+      )
     }
   }
 
@@ -55,6 +84,7 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
     setConfirming(null)
     setError(null)
     setMessage(null)
+
     try {
       if (kind === 'chats') {
         const result = await deleteAllConversations()
@@ -74,7 +104,10 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
     <section className="page-panel" aria-label="Privacy and data">
       <div>
         <h2>Privacy and data</h2>
-        <p className="hint">See what MindMate keeps, what leaves this app, and how to remove it.</p>
+        <p className="hint">
+          Understand what MindMate stores, what information is shared with the
+          AI provider, and how you can manage or delete your data.
+        </p>
       </div>
 
       {error && (
@@ -82,13 +115,14 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
           {error}
         </p>
       )}
+
       {message && !error && (
         <p className="success" role="status">
           {message}
         </p>
       )}
 
-      {!info && !error && <p className="hint">Loading...</p>}
+      {!info && !error && <p className="hint">Loading privacy information...</p>}
 
       {info && (
         <>
@@ -99,12 +133,21 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
               </span>
               <h3>What is stored</h3>
             </div>
+
             <p className="hint">{info.storage_location}</p>
+
+            <p>The following information is stored by MindMate:</p>
+
             <ul>
               {info.stored.map((item) => (
                 <li key={item.table}>{item.what}</li>
               ))}
             </ul>
+
+            <p className="hint">
+              Your conversations, memories, and settings are stored locally by
+              the backend in its SQLite database.
+            </p>
           </div>
 
           <div className="card">
@@ -114,14 +157,37 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
               </span>
               <h3>What is sent to the AI provider</h3>
             </div>
+
+            <p>
+              MindMate sends information to your configured AI provider when
+              you send a message and request a reply.
+            </p>
+
             <ul>
-              {info.sent_to_ai_provider.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
+              <li>
+                Your latest message and recent messages from the current
+                conversation.
+              </li>
+              <li>
+                Relevant saved memories, only when memory is enabled.
+              </li>
+              <li>
+                Your selected response instructions when you choose
+                non-default personalization settings.
+              </li>
             </ul>
+
             <p className="hint">
-              The provider you configured receives this text and handles it under its own terms. This app does
-              not control what the provider does with it.
+              When memory is turned off, saved memories are not included in AI
+              requests, and no new memory suggestions are created. Your chat
+              messages are still sent to the AI provider. Turning memory off
+              does not delete existing memories or conversations.
+            </p>
+
+            <p className="hint">
+              The configured AI provider receives the information sent by
+              MindMate and handles it under its own terms. MindMate does not
+              control how the provider processes or retains that information.
             </p>
           </div>
 
@@ -132,13 +198,21 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
               </span>
               <h3>What is not stored in the database</h3>
             </div>
+
             <ul>
               {info.not_stored_in_database.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
+
             <p className="hint">
-              This is a local app with no sign-in, and it has not had a security review. Do not expose it to the
+              The API key is kept in the backend/.env configuration file and
+              is not included in the database or data export.
+            </p>
+
+            <p className="hint">
+              MindMate is currently a local application with no user sign-in.
+              It has not undergone a security review. Do not expose it to the
               public internet as it is.
             </p>
           </div>
@@ -157,11 +231,17 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
           <div>
             <strong>Export my data</strong>
             <p className="hint">
-              Downloads one readable file with your conversations, memories and settings. It never includes
-              your API key.
+              Downloads a JSON file containing your conversations, messages,
+              saved memories, memory suggestions, and settings. It does not
+              include your API key. Keep the downloaded file private.
             </p>
           </div>
-          <button type="button" className="with-icon" onClick={handleExport}>
+
+          <button
+            type="button"
+            className="with-icon"
+            onClick={handleExport}
+          >
             <Icon name="download" size={16} />
             Export
           </button>
@@ -170,9 +250,17 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
         <div className="control-row">
           <div>
             <strong>Delete all conversations</strong>
-            <p className="hint">Removes every chat and its messages. Saved memories are not affected.</p>
+            <p className="hint">
+              Removes all conversations and their messages. Your saved
+              memories and settings are not affected.
+            </p>
           </div>
-          <button type="button" className="danger-btn with-icon" onClick={() => setConfirming('chats')}>
+
+          <button
+            type="button"
+            className="danger-btn with-icon"
+            onClick={() => setConfirming('chats')}
+          >
             <Icon name="trash" size={16} />
             Delete
           </button>
@@ -181,9 +269,17 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
         <div className="control-row">
           <div>
             <strong>Clear all memories</strong>
-            <p className="hint">Removes every saved memory. Your conversations are not affected.</p>
+            <p className="hint">
+              Removes all saved memories and memory suggestions. Your
+              conversations and settings are not affected.
+            </p>
           </div>
-          <button type="button" className="danger-btn with-icon" onClick={() => setConfirming('memories')}>
+
+          <button
+            type="button"
+            className="danger-btn with-icon"
+            onClick={() => setConfirming('memories')}
+          >
             <Icon name="trash" size={16} />
             Clear
           </button>
@@ -203,7 +299,7 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
       <ConfirmDialog
         open={confirming === 'memories'}
         title="Clear all memories?"
-        message="Every saved memory will be removed. This cannot be undone. Your conversations are not affected."
+        message="Every saved memory and memory suggestion will be removed. This cannot be undone. Your conversations are not affected."
         confirmLabel="Clear all"
         danger
         onConfirm={() => handleDelete('memories')}
@@ -212,4 +308,3 @@ export default function PrivacyPanel({ onConversationsDeleted, onMemoryChange }:
     </section>
   )
 }
-

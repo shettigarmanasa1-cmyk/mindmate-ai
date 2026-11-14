@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from 'react'
+﻿
+import { useEffect, useState } from 'react'
 import { getSettings, updateSettings } from '../lib/api'
 import type { AppSettings } from '../lib/api'
 import { PRESETS } from '../lib/appearance'
@@ -20,29 +21,37 @@ export default function SettingsPanel() {
   useEffect(() => {
     getSettings()
       .then(setSettings)
-      .catch((err) => setError(err instanceof Error ? err.message : 'Could not load settings.'))
+      .catch((err) =>
+        setError(err instanceof Error ? err.message : 'Could not load settings.')
+      )
   }, [])
 
-  // auto-hide: the "Saved" note disappears by itself.
+  // Auto-hide the "Saved" message.
   useEffect(() => {
     if (status !== 'Saved') return
     const timer = setTimeout(() => setStatus(null), 2500)
     return () => clearTimeout(timer)
   }, [status])
+
   async function change(changes: Partial<AppSettings>) {
     setError(null)
     setStatus('Saving...')
+
     try {
       setSettings(await updateSettings(changes))
       setStatus('Saved')
     } catch (err) {
       setStatus(null)
-      setError(err instanceof Error ? err.message : 'Could not save that setting.')
+      setError(
+        err instanceof Error ? err.message : 'Could not save that setting.'
+      )
     }
   }
 
   const preset = PRESETS.find((p) => p.color === appearance.accent)
-  const accentName = preset ? preset.name : 'Custom (' + appearance.accent + ')'
+  const accentName = preset
+    ? preset.name
+    : 'Custom (' + appearance.accent + ')'
 
   return (
     <section className="page-panel" aria-label="Settings">
@@ -56,8 +65,10 @@ export default function SettingsPanel() {
 
       <div className="settings-section">
         <h3>Personalization</h3>
+
         <p className="hint">
-          These are choices you make yourself. They are separate from memories, which you approve one by one.
+          Customize how MindMate responds to you. These preferences are
+          separate from your saved memories.
         </p>
 
         {settings && (
@@ -68,10 +79,13 @@ export default function SettingsPanel() {
                 checked={settings.memory_enabled}
                 onChange={(e) => change({ memory_enabled: e.target.checked })}
               />
+
               <span>
                 Use memory for personalization
                 <span className="hint block">
-                  When off, saved memories are not sent to the AI and no new suggestions are made.
+                  When off, saved memories are not shared with the AI, and no
+                  new memory suggestions are created. Your chat messages are
+                  still sent to the AI provider to generate replies.
                 </span>
               </span>
             </label>
@@ -80,7 +94,11 @@ export default function SettingsPanel() {
               <span>Response style</span>
               <select
                 value={settings.response_style}
-                onChange={(e) => change({ response_style: e.target.value as AppSettings['response_style'] })}
+                onChange={(e) =>
+                  change({
+                    response_style: e.target.value as AppSettings['response_style'],
+                  })
+                }
               >
                 <option value="friendly">Friendly</option>
                 <option value="professional">Professional</option>
@@ -92,7 +110,11 @@ export default function SettingsPanel() {
               <span>Answer length</span>
               <select
                 value={settings.answer_length}
-                onChange={(e) => change({ answer_length: e.target.value as AppSettings['answer_length'] })}
+                onChange={(e) =>
+                  change({
+                    answer_length: e.target.value as AppSettings['answer_length'],
+                  })
+                }
               >
                 <option value="short">Short</option>
                 <option value="balanced">Balanced</option>
@@ -104,9 +126,17 @@ export default function SettingsPanel() {
               <input
                 type="checkbox"
                 checked={settings.beginner_friendly}
-                onChange={(e) => change({ beginner_friendly: e.target.checked })}
+                onChange={(e) =>
+                  change({ beginner_friendly: e.target.checked })
+                }
               />
-              <span>Beginner-friendly explanations</span>
+
+              <span>
+                Beginner-friendly explanations
+                <span className="hint block">
+                  Uses simple language and explains technical terms.
+                </span>
+              </span>
             </label>
 
             <p className="status" role="status">
@@ -115,15 +145,21 @@ export default function SettingsPanel() {
           </div>
         )}
 
-        {!settings && !error && <p className="hint">Loading settings...</p>}
+        {!settings && !error && (
+          <p className="hint">Loading settings...</p>
+        )}
       </div>
 
       <div className="settings-section">
         <h3>Appearance</h3>
-        <p className="hint">Changes apply right away and are remembered in this browser.</p>
+
+        <p className="hint">
+          Changes apply right away and are remembered in this browser.
+        </p>
 
         <div className="field">
           <span>Theme</span>
+
           <div className="segmented" role="group" aria-label="Theme">
             {MODES.map((mode) => (
               <button
@@ -136,11 +172,15 @@ export default function SettingsPanel() {
               </button>
             ))}
           </div>
-          <span className="hint">System follows your device's light or dark setting.</span>
+
+          <span className="hint">
+            System follows your device's light or dark setting.
+          </span>
         </div>
 
         <div className="field">
           <span>Accent color</span>
+
           <div className="swatches">
             {PRESETS.map((p) => (
               <button
@@ -155,6 +195,7 @@ export default function SettingsPanel() {
               />
             ))}
           </div>
+
           <label className="custom-color">
             <input
               type="color"
@@ -164,13 +205,18 @@ export default function SettingsPanel() {
             />
             <span>Pick any color</span>
           </label>
+
           <span className="hint">Selected: {accentName}</span>
         </div>
 
         <div className="field">
           <span>Preview</span>
+
           <div className="preview" aria-label="Appearance preview">
-            <div className="bubble-user">How do I add a route in FastAPI?</div>
+            <div className="bubble-user">
+              How do I add a route in FastAPI?
+            </div>
+
             <div className="bubble-ai">
               Use a router decorator. See{' '}
               <a href="#preview" onClick={(e) => e.preventDefault()}>
@@ -178,11 +224,14 @@ export default function SettingsPanel() {
               </a>{' '}
               for more.
             </div>
+
             <div className="preview-row">
               <button type="button" className="primary-btn">
                 Primary button
               </button>
+
               <button type="button">Secondary</button>
+
               <label className="check-row">
                 <input type="checkbox" defaultChecked />
                 <span>Checkbox</span>
@@ -200,4 +249,3 @@ export default function SettingsPanel() {
     </section>
   )
 }
-
