@@ -246,3 +246,17 @@ This is a local single-user app. It has no authentication and has not had a secu
 - Streaming replies.
 - Authentication, rate limiting and usage limits before any public deployment.
 - Persistent hosting for the database.
+
+## Screenshots
+
+### 1. Chat Interface
+![MindMate AI Chat](screenshots/chat.png)
+
+### 2. Memory Management
+![MindMate AI Memories](screenshots/memories.png)
+
+### 3. Settings and Appearance
+![MindMate AI Settings](screenshots/settings.png)
+
+### 4. Privacy and Data Controls
+![MindMate AI Privacy](screenshots/privacy.png)
