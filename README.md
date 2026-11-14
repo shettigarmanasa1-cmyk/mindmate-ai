@@ -6,25 +6,28 @@ Built as a learning and portfolio project: React + TypeScript frontend, FastAPI 
 
 ## Features
 
-- Chat with an AI model, with follow-up questions, loading states and safe error messages
-- Conversation history: create, reopen, rename, delete and search chats
-- Long-term memory that is never saved without approval
-- Suggestions after a message ("Save this to memory?") with Save or Don't save
-- Changed-preference handling: Replace or Keep old
-- Memory panel: add, edit, delete one memory, or clear all (with confirmation)
-- Memory transparency: each reply shows which memories were provided to the AI
-- Settings: memory on/off, response style, answer length, beginner-friendly mode
-- Privacy screen: what is stored and where, what is sent to the AI provider, data export, delete all chats, clear all memories
-- 76 automated backend tests that use a mocked AI (no API key or cost)
-- A small evaluation of memory retrieval and of memory on vs off
+- Chat with an AI model, with follow-up questions, loading states and safe error messages.
+- Conversation history: create, reopen, rename, delete and search chats.
+- Long-term memory that is never saved without user approval.
+- Memory suggestions after a message ("Save this to memory?") with Save or Don't save options.
+- Changed-preference handling: Replace or Keep old.
+- Memory panel: add, edit, delete individual memories, or clear all memories with confirmation.
+- Memory transparency: each reply shows which memories were provided to the AI.
+- Personalization settings: enable or disable memory, choose response style, adjust answer length and enable beginner-friendly explanations.
+- Appearance settings: Light, Dark and System themes, preset accent colors, custom accent colors, live preview and reset to defaults.
+- Privacy dashboard: understand what information is stored, what is shared with the AI provider and where application data is stored.
+- Data controls: export conversations, memories and settings, delete all conversations or clear all memories.
+- API key is kept in the backend configuration file and is not included in the database export.
+- 76 automated backend tests that use a mocked AI (no API key or cost).
+- A small evaluation of memory retrieval and of memory on vs off.
 
 ## How memory works
 
 MindMate keeps three kinds of information separate:
 
-1. **Current conversation:** the latest messages of the open chat (up to 20), sent to the AI.
-2. **Conversation history:** all saved chats and messages in SQLite. Not used as memory.
-3. **Long-term memories:** short facts the user approved, stored in their own table.
+1. **Current conversation:** The latest messages of the open chat (up to 20), sent to the AI.
+2. **Conversation history:** All saved chats and messages in SQLite. Not used as long-term memory.
+3. **Long-term memories:** Short facts the user approved, stored in their own table.
 
 What happens for each message:
 
@@ -37,9 +40,70 @@ What happens for each message:
 
 "Provided" means sent to the model. The model may not have used it, so the interface never claims a memory "was used".
 
+## Settings and personalization
+
+MindMate provides settings that let users control how the chatbot responds.
+
+### Personalization
+
+- **Use memory for personalization:** Turn long-term memory on or off.
+- **Response style:** Choose Friendly, Professional or Casual.
+- **Answer length:** Choose Short, Balanced or Detailed.
+- **Beginner-friendly explanations:** Enable simple explanations and definitions of technical terms.
+
+When memory is turned off, saved memories are not included in AI requests and no new memory suggestions are created. Chat messages are still sent to the AI provider to generate replies. Turning memory off does not delete existing memories or conversations.
+
+### Appearance
+
+Users can customize the application's appearance:
+
+- Light, Dark and System themes.
+- Multiple preset accent colors.
+- Custom accent color selection.
+- Live appearance preview.
+- Reset appearance settings to defaults.
+
+Appearance preferences are remembered in the browser.
+
+## Privacy and data controls
+
+The Privacy and Data section explains how MindMate handles application information.
+
+### What is stored
+
+MindMate stores the following information in a local SQLite database:
+
+- Conversations and messages.
+- Approved long-term memories.
+- Memory suggestions (pending, approved and rejected).
+- User settings.
+
+### What is sent to the AI provider
+
+To generate replies, MindMate can send:
+
+- The latest user message and recent messages from the current conversation.
+- Relevant saved memories, only when memory is enabled.
+- Non-default response instructions selected in settings.
+
+The configured AI provider processes the information under its own terms. MindMate does not control how the provider handles or retains that information.
+
+### Data management
+
+Users can:
+
+- Export conversations, memories, memory suggestions and settings as a JSON file.
+- Delete all conversations and their messages.
+- Clear all saved memories and memory suggestions.
+- Turn off memory without deleting existing conversations or memories.
+
+The API key is kept in `backend/.env` and is not included in the SQLite database or data export.
+
+**Privacy note:** MindMate is currently a local single-user application with no sign-in. It has not undergone a security review and should not be exposed to the public internet as it is.
+
 ## Architecture
 
-    React + TypeScript (Vite)  --/api-->  FastAPI  -->  SQLite
+    React + TypeScript (Vite)  --/api-->  FastAPI  --> SQLite
                                              |
                                              +--> OpenAI-compatible chat API
 
@@ -156,10 +220,10 @@ Median latency was 2.43 s with memory on and 3.19 s with memory off. The slowest
 
 ## Privacy and security
 
-- The API key lives only in `backend/.env`. It is not in frontend code, not in the database and not in exports.
+- The API key lives in `backend/.env`. It is not in frontend code, not in the database and not in exports.
 - CORS allows only the configured frontend origin.
 - SQL queries use parameters, input is validated, and error messages do not expose internals.
-- Destructive actions need a confirmation in the interface, and the server also requires `confirm=true`.
+- Destructive actions need confirmation in the interface, and the server also requires `confirm=true`.
 - Saved memories are treated as untrusted text, not instructions.
 - Users can view, edit and delete memories, turn memory off, and export or delete their data.
 
@@ -177,8 +241,8 @@ This is a local single-user app. It has no authentication and has not had a secu
 
 ## Future improvements
 
-- Embedding-based retrieval (better meaning matching, with extra cost and complexity)
-- Use earlier turns of the conversation when retrieving memories
-- Streaming replies
-- Authentication, rate limiting and usage limits before any public deployment
-- Persistent hosting for the database
+- Embedding-based retrieval (better meaning matching, with extra cost and complexity).
+- Use earlier turns of the conversation when retrieving memories.
+- Streaming replies.
+- Authentication, rate limiting and usage limits before any public deployment.
+- Persistent hosting for the database.
